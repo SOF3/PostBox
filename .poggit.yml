@@ -3,3 +3,4 @@ projects:
     libs:
       - src: poggit/libasynql/libasynql
         version: ^3.0
+        branch: "*"
