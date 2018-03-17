@@ -4,3 +4,4 @@ main: SOFe\PostBox\PostBox
 version: 1.0.0
 api: [3.0.0-ALPHA11]
 depend: [FormAPI]
+description: Offline messages for players. Supports SQLite and MySQL.
