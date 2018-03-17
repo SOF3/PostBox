@@ -1,0 +1,17 @@
+database:
+  type: sqlite
+  sqlite:
+    file: posts.sqlite
+  mysql:
+    host: 127.0.0.1
+    username: root
+    password: ""
+    schema: postbox
+# settings related to the user interface
+ui:
+  # when to group unread messages by senders instead of showing them all together?
+  group-unreads:
+    # the minimum ratio of messages to senders
+    min-ratio: 2.0
+    # the minimum number of different senders
+    min-senders: 5
