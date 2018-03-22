@@ -47,6 +47,9 @@ class MailCommand extends Command implements PluginIdentifiableCommand{
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args) : bool{
+		if(!$this->testPermission($sender)){
+			return false;
+		}
 		if(!isset($args[1])){
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return false;
