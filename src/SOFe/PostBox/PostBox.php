@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
+use jojoe77777\FormAPI\Form;
 use jojoe77777\FormAPI\FormAPI;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -31,6 +32,8 @@ use pocketmine\utils\TextFormat;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use poggit\libasynql\result\SqlSelectResult;
+use ReflectionClass;
+use RuntimeException;
 use function count;
 use function date;
 use function is_int;
@@ -38,8 +41,16 @@ use function sprintf;
 use function strlen;
 use function strpos;
 use function substr;
+use function var_dump;
 
 class PostBox extends PluginBase implements Listener{
+	public const TYPE_PLAYER = "postbox.player";
+	public const TYPE_SERVER = "postbox.server";
+
+	public const NEUTRAL_PRIORITY = 0;
+	public const HIGH_PRIORITY = 5;
+	public const LOW_PRIORITY = -5;
+
 	/** @var DataConnector */
 	private $provider;
 	/** @var FormAPI */
@@ -49,29 +60,45 @@ class PostBox extends PluginBase implements Listener{
 		$this->saveDefaultConfig();
 
 		$this->formAPI = $this->getServer()->getPluginManager()->getPlugin("FormAPI");
+		$this->checkFormAPI();
 
 		$this->provider = libasynql::create($this, $this->getConfig()->get("database"), [
 			"sqlite" => "sqlite.sql",
 			"mysql" => "mysql.sql",
 		]);
-		$this->provider->executeGeneric("postbox.init-posts", []);
+		$this->provider->executeGeneric(Queries::POSTBOX_INIT_POSTS);
+		$this->provider->executeGeneric(Queries::POSTBOX_INIT_PLAYERS);
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		$this->getServer()->getCommandMap()->register("postbox", new MailCommand($this));
+	}
+
+	private function checkFormAPI() : void{
+		$class = new ReflectionClass(Form::class);
+		if(!$class->hasMethod("setCallable")){
+			throw new RuntimeException("Please update FormAPI!");
+		}
 	}
 
 	public function e_onJoin(PlayerJoinEvent $event) : void{
 		$player = $event->getPlayer();
-		$this->provider->executeSelect("postbox.unread.dashboard", ["username" => $player->getName()], function(SqlSelectResult $result) use ($player){
+		$this->provider->executeInsert(Queries::POSTBOX_PLAYER_TOUCH, ["name" => $player->getName()]);
+		$this->checkUnreads($player);
+	}
+
+	public function checkUnreads(Player $player){
+		$this->provider->executeSelect(Queries::POSTBOX_UNREAD_DASHBOARD, ["username" => $player->getName()], function(SqlSelectResult $result) use ($player){
 			$rows = $result->getRows();
 			if(count($rows) === 1){
-				$this->showUnreads($player, $rows[0]["sender_type"], $rows[0]["sender_count"], $rows[0]["message_count"]);
+				$this->showTypeUnreads($player, $rows[0]["sender_type"], $rows[0]["sender_count"], $rows[0]["message_count"]);
 			}elseif(count($rows) >= 2){
 				$form = $this->formAPI->createSimpleForm();
 				$messages = 0;
 				$senders = 0;
 				foreach($rows as $row){
-					$type = $this->nameSenderType($row["sender_type"]); // TODO convert type to player-readable name
-					$form->addButton(sprintf("%s (%d senders, %d messages)", $type, $row["sender_count"], $row["message_count"]));
+					$form->addButton(sprintf("%s (%d senders, %d messages)",
+						$this->nameSenderType($row["sender_type"], PostBoxNameSenderTypeEvent::TYPE_MODE_CATEGORY),
+						$row["sender_count"], $row["message_count"]));
 					$messages += $row["message_count"];
 					$senders += $row["sender_count"];
 				}
@@ -81,7 +108,7 @@ class PostBox extends PluginBase implements Listener{
 					if(is_int($choice)){
 						$row = $rows[$choice];
 						$type = $row["sender_type"];
-						$this->showUnreads($player, $type, $row["sender_count"], $row["message_count"]);
+						$this->showTypeUnreads($player, $type, $row["sender_count"], $row["message_count"]);
 					}
 				});
 				$form->sendToPlayer($player);
@@ -89,17 +116,16 @@ class PostBox extends PluginBase implements Listener{
 		});
 	}
 
-	public function showUnreads(Player $player, string $type, int $senderCount, int $messageCount) : void{
+	public function showTypeUnreads(Player $player, string $type, int $senderCount, int $messageCount) : void{
 		if($senderCount >= $this->getConfig()->getNested("ui.group-unreads.min-senders", 5) &&
 			$messageCount / $senderCount >= $this->getConfig()->getNested("ui.group-unreads.min-ratio", 2.0)){
 			// collapse mode
-			$this->provider->executeSelect("postbox.unread.by-type.collapse", [
+			$this->provider->executeSelect(Queries::POSTBOX_UNREAD_BY_TYPE_COLLAPSE, [
 				"username" => $player->getName(),
 				"type" => $type
 			], function(SqlSelectResult $result) use ($player, $type): void{
-				$typeName = $this->nameSenderType($type);
 				$form = $this->formAPI->createSimpleForm();
-				$form->setTitle("PostBox - Messages from $typeName");
+				$form->setTitle("PostBox - Messages from " . $this->nameSenderType($type, PostBoxNameSenderTypeEvent::TYPE_MODE_FROM));
 				$messages = 0;
 				$rows = $result->getRows();
 				foreach($rows as $row){
@@ -109,7 +135,7 @@ class PostBox extends PluginBase implements Listener{
 				$form->setContent(sprintf("%d messages from %d senders", $messages, count($rows)));
 				$form->setCallable(function($p, int $choice) use ($player, $type, $rows){
 					$who = $rows[$choice]["sender_name"];
-					$this->provider->executeSelect("postbox.unread.by-type-name", [
+					$this->provider->executeSelect(Queries::POSTBOX_UNREAD_BY_TYPE_NAME, [
 						"username" => $player->getName(),
 						"type" => $type,
 						"sender" => $who
@@ -121,7 +147,7 @@ class PostBox extends PluginBase implements Listener{
 			});
 		}else{
 			// expand mode
-			$this->provider->executeSelect("postbox.unread.by-type.expand", [
+			$this->provider->executeSelect(Queries::POSTBOX_UNREAD_BY_TYPE_EXPANDED, [
 				"username" => $player->getName(),
 				"type" => $type,
 			], function(SqlSelectResult $result) use ($player): void{
@@ -133,19 +159,20 @@ class PostBox extends PluginBase implements Listener{
 	/**
 	 * @param Player      $player
 	 * @param null|string $who
-	 * @param array       $rows [post_id, message, send_time]
+	 * @param array       $rows [post_id, message, send_time, ?sender_name]
 	 */
 	private function showMessages(Player $player, ?string $who, array $rows){
 		$form = $this->formAPI->createCustomForm();
-		$form->setTitle("Messages from $who");
+		$form->setTitle($who !== null ? "New Messages from $who" : "New Messages");
 		$messages = []; // security check: don't let the player delete arbitrary messages!
 		foreach($rows as $row){
-			$form->addLabel(date("Y-m-d H:i:s", $row["send_time"]));
+			$form->addLabel(($who !== null ? "" : ($row["sender_name"] . ", ")) . date("Y-m-d H:i:s", $row["send_time"]));
 			$form->addLabel($row["message"]);
 			$form->addToggle("Mark as read", true, "read_" . $row["post_id"]);
 			$messages[$row["post_id"]] = true;
 		}
 		$form->setCallable(function($p, $data) use ($player, $messages){
+			var_dump($data);
 			$readIds = [];
 			foreach($data as $k => $v){
 				if($v === true && strpos($k, "read_") !== false){
@@ -155,25 +182,46 @@ class PostBox extends PluginBase implements Listener{
 						$this->getLogger()->critical($player->getName() . " wants to hack $postId!");
 						return;
 					}
+					$readIds[] = (int) $postId;
 				}
-				$readIds[] = (int) $v;
 			}
-			$this->provider->executeChange("postbox.mark-read", [
-				"username" => $player->getName(),
-				"ids" => $readIds
-			]);
+			if(count($readIds) > 0){
+				$this->provider->executeChange(Queries::POSTBOX_MARK_READ, [
+					"username" => $player->getName(),
+					"ids" => $readIds
+				]);
+			}
 		});
 		$form->sendToPlayer($player);
 	}
 
 	public function e_nameSenderType(PostBoxNameSenderTypeEvent $event) : void{
-		if($event->getType() === "postbox.player"){
-			$event->setName("Players");
+		switch($event->getType()){
+			case self::TYPE_PLAYER:
+				switch($event->getMode()){
+					case PostBoxNameSenderTypeEvent::TYPE_MODE_CATEGORY:
+						$event->setName("Personal");
+						break;
+					case PostBoxNameSenderTypeEvent::TYPE_MODE_FROM:
+						$event->setName("Players");
+						break;
+				}
+				break;
+			case self::TYPE_SERVER:
+				switch($event->getMode()){
+					case PostBoxNameSenderTypeEvent::TYPE_MODE_CATEGORY:
+						$event->setName("Official");
+						break;
+					case PostBoxNameSenderTypeEvent::TYPE_MODE_FROM:
+						$event->setName($this->getServer()->getMotd());
+						break;
+				}
+				break;
 		}
 	}
 
 	public function sendMessage(string $message, string $recipientName, string $senderName, string $senderType, int $priority, ?callable $callback = null) : void{
-		$this->provider->executeInsert("postbox.send-message", [
+		$this->provider->executeInsert(Queries::POSTBOX_SEND_MESSAGE, [
 			"recipient" => $recipientName,
 			"senderType" => $senderType,
 			"senderName" => $senderName,
@@ -182,8 +230,12 @@ class PostBox extends PluginBase implements Listener{
 		], $callback);
 	}
 
-	public function nameSenderType(string $type){
-		$this->getServer()->getPluginManager()->callEvent($ev = new PostBoxNameSenderTypeEvent($this, $type));
+	public function nameSenderType(string $type, string $mode){
+		$this->getServer()->getPluginManager()->callEvent($ev = new PostBoxNameSenderTypeEvent($this, $type, $mode));
 		return $ev->getName() ?? $type;
+	}
+
+	public function getProvider() : DataConnector{
+		return $this->provider;
 	}
 }

@@ -1,3 +1,4 @@
+# database settings
 database:
   type: sqlite
   sqlite:
@@ -7,6 +8,7 @@ database:
     username: root
     password: ""
     schema: postbox
+  worker-limit: 2
 # settings related to the user interface
 ui:
   # when to group unread messages by senders instead of showing them all together?
@@ -15,3 +17,6 @@ ui:
     min-ratio: 2.0
     # the minimum number of different senders
     min-senders: 5
+  mail:
+    # the player will be warned if someone tries to send a mail to an inactive player who haven't joined the server for ? number of days
+    warn-inactive: 30

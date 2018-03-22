@@ -1,6 +1,7 @@
 -- #!mysql
 -- #{postbox
--- #    {init-posts
+-- #    {init
+-- #        {posts
 CREATE TABLE IF NOT EXISTS postbox_posts (
 	post_id     BIGINT PRIMARY KEY AUTO_INCREMENT,
 	recipient   VARCHAR(100),
@@ -12,6 +13,13 @@ CREATE TABLE IF NOT EXISTS postbox_posts (
 	is_unread   BOOL               DEFAULT TRUE,
 	INDEX (recipient)
 );
+-- #        }
+-- #        {players
+CREATE TABLE IF NOT EXISTS postbox_player_log (
+	player_name VARCHAR(100) PRIMARY KEY,
+	last_online TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- #        }
 -- #    }
 -- #    {unread
 -- #        {dashboard
@@ -82,5 +90,21 @@ WHERE recipient = :username AND post_id IN :ids;
 -- #        :message string
 INSERT INTO postbox_posts (recipient, sender_type, sender_name, priority, message)
 VALUES (:recipient, :senderType, :senderName, :priority, :message);
+-- #    }
+-- #    {player
+-- #        {find
+-- #            {by-name
+-- #                :name string
+SELECT last_online
+FROM postbox_player_log
+WHERE player_name = :name;
+-- #            }
+-- #        }
+-- #        {touch
+-- #            :name string
+INSERT INTO postbox_player_log (player_name, last_online)
+VALUES (:name, CURRENT_TIMESTAMP)
+ON DUPLICATE KEY UPDATE last_online = CURRENT_TIMESTAMP;
+-- #        }
 -- #    }
 -- #}

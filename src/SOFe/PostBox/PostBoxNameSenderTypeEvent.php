@@ -25,19 +25,30 @@ namespace SOFe\PostBox;
 use pocketmine\event\plugin\PluginEvent;
 
 class PostBoxNameSenderTypeEvent extends PluginEvent{
+	public const TYPE_MODE_FROM = "postbox.from";
+	public const TYPE_MODE_CATEGORY = "postbox.category";
+	public static $handlerList = null;
+
 	/** @var string */
 	private $type;
 
 	/** @var string|null */
 	private $name;
+	/** @var string */
+	private $mode;
 
-	public function __construct(PostBox $plugin, string $type){
+	public function __construct(PostBox $plugin, string $type, string $mode){
 		parent::__construct($plugin);
 		$this->type = $type;
+		$this->mode = $mode;
 	}
 
 	public function getType() : string{
 		return $this->type;
+	}
+
+	public function getMode() : string{
+		return $this->mode;
 	}
 
 	public function getName() : ?string{

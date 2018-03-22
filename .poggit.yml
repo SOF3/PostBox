@@ -4,3 +4,4 @@ projects:
       - src: poggit/libasynql/libasynql
         version: ^3.0
         branch: "*"
+        epitope: ".random"

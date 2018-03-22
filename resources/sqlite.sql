@@ -1,6 +1,7 @@
 -- #!sqlite
 -- #{postbox
--- #    {init-posts
+-- #    {init
+-- #        {posts
 CREATE TABLE IF NOT EXISTS postbox_posts (
 	post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
 	recipient   TEXT COLLATE NOCASE,
@@ -11,6 +12,13 @@ CREATE TABLE IF NOT EXISTS postbox_posts (
 	send_time   INTEGER             DEFAULT (STRFTIME('%s', 'now')),
 	is_unread   INT                 DEFAULT 1
 );
+-- #        }
+-- #        {players
+CREATE TABLE IF NOT EXISTS postbox_player_log (
+	player_name TEXT COLLATE NOCASE PRIMARY KEY,
+	last_online INTEGER DEFAULT (STRFTIME('%s', 'now'))
+);
+-- #        }
 -- #    }
 -- #    {unread
 -- #        {dashboard
@@ -89,5 +97,20 @@ WHERE recipient = :username AND post_id IN :ids;
 -- #        :message string
 INSERT INTO postbox_posts (recipient, sender_type, sender_name, priority, message)
 VALUES (:recipient, :senderType, :senderName, :priority, :message);
+-- #    }
+-- #    {player
+-- #        {find
+-- #            {by-name
+-- #                :name string
+SELECT last_online
+FROM postbox_player_log
+WHERE player_name = :name;
+-- #            }
+-- #        }
+-- #        {touch
+-- #            :name string
+INSERT OR REPLACE INTO postbox_player_log (player_name, last_online)
+VALUES (:name, STRFTIME('%s', 'now'));
+-- #        }
 -- #    }
 -- #}

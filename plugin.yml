@@ -5,3 +5,15 @@ version: 1.0.0
 api: [3.0.0-ALPHA11]
 depend: [FormAPI]
 description: Offline messages for players. Supports SQLite and MySQL.
+permissions:
+  postbox:
+    description: PostBox main command
+    children:
+      postbox.mail:
+        description: Permission to send any mail
+        children:
+          postbox.mail.personal:
+            description: Permission to send a personal, one-to-one mail
+            default: true
+          postbox.mail.server:
+            description: Permission to send a mail on behalf of the server
