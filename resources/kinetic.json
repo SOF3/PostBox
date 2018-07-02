@@ -1,0 +1,164 @@
+{
+    "name": "LIBRARY",
+    "attrs": {
+        "ID": "postbox",
+        "NAMESPACE": "SOFe\\PostBox",
+        "TITLE": "="
+    },
+    "children": [
+        {
+            "name": "COMMAND",
+            "attrs": {
+                "NAME": "postbox"
+            },
+            "children": [
+                {
+                    "name": "ALIAS",
+                    "text": "pb"
+                }
+            ]
+        },
+        {
+            "name": "SYNOPSIS",
+            "text": "main.synopsis"
+        },
+        {
+            "name": "SWITCH",
+            "attrs": {
+                "PREDICATE": "PostBoxEntryPredicate"
+            }
+        },
+        {
+            "name": "COMPLEX",
+            "attrs": {
+                "ID": "messageList"
+            },
+            "children": [
+                {
+                    "name": "CONFIG",
+                    "attrs": {
+                        "ID": "filters",
+                        "PERSIST": "true"
+                    },
+                    "children": [
+                        {
+                            "name": "DROPDOWN",
+                            "attrs": {
+                                "ID": "type",
+                                "PROVIDER": "SenderTypesProvider"
+                            }
+                        },
+                        {
+                            "name": "INPUT",
+                            "attrs": {
+                                "ID": "sender",
+                                "PLACEHOLDER": "=Leave empty to read messages from everyone"
+                            }
+                        },
+                        {
+                            "name": "TOGGLE",
+                            "attrs": {
+                                "ID": "unreadOnly",
+                                "DEFAULT": "true"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "BEFORE",
+                    "children": [
+                        {
+                            "name": "INPUT",
+                            "attrs": {
+                                "ID": "reply"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "EACH",
+                    "children": [
+                        {
+                            "name": "LABEL",
+                            "attrs": {
+                                "ID": "messageContent"
+                            }
+                        },
+                        {
+                            "name": "TOGGLE",
+                            "attrs": {
+                                "ID": "markAsRead"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "SUBMIT"
+                }
+            ]
+        },
+        {
+            "name": "LIST",
+            "attrs": {
+                "ID": "sendersByType",
+                "PROVIDER": "UnreadTypeSendersProvider",
+                "SINGLEENTRY": "true"
+            },
+            "children": [
+                {
+                    "name": "CONFIG",
+                    "attrs": {
+                        "ID": "filters",
+                        "PERSIST": "true"
+                    },
+                    "children": [
+                        {
+                            "name": "DROPDOWN",
+                            "attrs": {
+                                "ID": "type",
+                                "PROVIDER": "SenderTypesProvider"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "EACH",
+                    "attrs": {
+                        "CONFIGNAME": "filters.sender"
+                    },
+                    "children": [
+                        {
+                            "name": "LINK",
+                            "attrs": {
+                                "TARGET": "postbox.messageList"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "LIST",
+            "attrs": {
+                "ID": "types",
+                "PROVIDER": "UnreadTypesProvider"
+            },
+            "children": [
+                {
+                    "name": "EACH",
+                    "attrs": {
+                        "CONFIGNAME": "filters.type"
+                    },
+                    "children": [
+                        {
+                            "name": "LINK",
+                            "attrs": {
+                                "TARGET": "postbox.sendersByType"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
