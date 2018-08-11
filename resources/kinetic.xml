@@ -1,53 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<root namespace="SOFe\PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
-    <list id="group-by-type" provider="MailTypeListProvider" title="groups.types.title" synopsis="groups.types.synopsis">
+<kinetic namespace="PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
+    <series id="group-by-type">
         <command name="postbox">
-            <alias>pb</alias>
+            <alias name="pb"/>
         </command>
-    </list>
-</root>
-<library id="postbox" namespace="SOFe\PostBox" title="=">
-<command name="postbox">
-    <alias>pb</alias>
-</command>
-<synopsis>main.synopsis</synopsis>
 
-<switch predicate="PostBoxEntryPredicate"/>
+        <onStart>
+            <or onFalse="exit">
+                <permission name="postbox" not="true"/>
+                <permission name="example" not="true"/>
+            </or>
+        </onStart>
 
-<complex id="messageList">
-    <config id="filters" persist="true">
-        <dropdown id="type" provider="SenderTypesProvider"/>
-        <input id="sender" placeholder="=Leave empty to read messages from everyone"/>
-        <toggle id="unreadOnly" default="true"/>
-    </config>
-
-    <before>
-        <input id="reply"/>
-    </before>
-
-    <each>
-        <label id="messageContent"/>
-        <toggle id="markAsRead"/>
-    </each>
-
-    <submit>
-
-    </submit>
-</complex>
-
-<list id="sendersByType" provider="UnreadTypeSendersProvider" singleEntry="true">
-    <config id="filters" persist="true">
-        <dropdown id="type" provider="SenderTypesProvider"/>
-    </config>
-
-    <each configName="filters.sender">
-        <link target="postbox.messageList"/>
-    </each>
-</list>
-
-<list id="types" provider="UnreadTypesProvider">
-    <each configName="filters.type">
-        <link target="postbox.sendersByType"/>
-    </each>
-</list>
-</library>
+        <list/>
+    </series>
+</kinetic>

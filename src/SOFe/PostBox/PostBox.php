@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
@@ -55,5 +56,14 @@ class PostBox extends PluginBase implements KineticAdapter{
 
 		$this->provider->executeGeneric(Queries::POSTBOX_INIT_POSTS);
 		$this->provider->executeGeneric(Queries::POSTBOX_INIT_PLAYERS);
+		$this->provider->waitAll();
+
+		foreach($this->getServer()->getOnlinePlayers() as $player){
+			$this->initPlayer($player);
+		}
+	}
+
+	public function initPlayer(Player $player) : void{
+
 	}
 }

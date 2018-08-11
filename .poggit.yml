@@ -11,6 +11,9 @@ projects:
         version: ^0.2
         epitope: ".random"
       - src: SOF3/libkinetic/libkinetic
-        version: ^0.0.2
+        version: ^0.0.3
         branch: "*"
+        epitope: ".random"
+      - src: SOF3/await-generator/await-generator
+        version: ^1.1.0
         epitope: ".random"
