@@ -11,7 +11,6 @@
                 <permission name="example" not="true"/>
             </or>
         </onStart>
-
         <list/>
     </series>
 </kinetic>
