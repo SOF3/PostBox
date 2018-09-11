@@ -8,7 +8,7 @@ projects:
         version: ^3.0
         epitope: ".random"
       - src: SOF3/libglocal/libglocal
-        version: ^0.2
+        version: ^0.3
         epitope: ".random"
       - src: SOF3/libkinetic/libkinetic
         version: ^0.0.3
