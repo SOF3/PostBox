@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<kinetic namespace="PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
-    <series id="group-by-type">
-        <command name="postbox">
-            <alias name="pb"/>
-        </command>
+<kinetic namespace="SOFe\PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
+	<series id="Messages-byType">
+		<command name="config:command">
+			<alias name="pb"/>
+		</command>
 
-        <onStart>
-            <or onFalse="exit">
-                <permission name="postbox" not="true"/>
-                <permission name="example" not="true"/>
-            </or>
-        </onStart>
-        <list/>
-    </series>
+		<onStart>
+			<or onFalse="exit">
+				<permission name="postbox" not="true"/>
+				<permission name="example" not="true"/>
+			</or>
+		</onStart>
+
+		<list provider="InboxSenderGroupProvider" title="test" synopsis="test2" autoSelect="true"/>
+	</series>
 </kinetic>

@@ -1,59 +1,49 @@
 {
-    "name": "KINETIC",
-    "attrs": {
-        "NAMESPACE": "PostBox",
-        "XMLNS": "https:\/\/rawgit.com\/SOF3\/libkinetic\/master\/libkinetic.xsd"
-    },
-    "children": [
+    "<": "kinetic",
+    "namespace": "SOFe\\PostBox",
+    "xmlns": "https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd",
+    "/": [
         {
-            "name": "SERIES",
-            "attrs": {
-                "ID": "group-by-type"
-            },
-            "children": [
+            "<": "series",
+            "id": "Messages-byType",
+            "/": [
                 {
-                    "name": "COMMAND",
-                    "attrs": {
-                        "NAME": "postbox"
-                    },
-                    "children": [
+                    "<": "command",
+                    "name": "config:command",
+                    "/": [
                         {
-                            "name": "ALIAS",
-                            "attrs": {
-                                "NAME": "pb"
-                            }
+                            "<": "alias",
+                            "name": "pb"
                         }
                     ]
                 },
                 {
-                    "name": "ONSTART",
-                    "children": [
+                    "<": "onStart",
+                    "/": [
                         {
-                            "name": "OR",
-                            "attrs": {
-                                "ONFALSE": "exit"
-                            },
-                            "children": [
+                            "<": "or",
+                            "onFalse": "exit",
+                            "/": [
                                 {
-                                    "name": "PERMISSION",
-                                    "attrs": {
-                                        "NAME": "postbox",
-                                        "NOT": "true"
-                                    }
+                                    "<": "permission",
+                                    "name": "postbox",
+                                    "not": "true"
                                 },
                                 {
-                                    "name": "PERMISSION",
-                                    "attrs": {
-                                        "NAME": "example",
-                                        "NOT": "true"
-                                    }
+                                    "<": "permission",
+                                    "name": "example",
+                                    "not": "true"
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "name": "LIST"
+                    "<": "list",
+                    "provider": "InboxSenderGroupProvider",
+                    "title": "test",
+                    "synopsis": "test2",
+                    "autoSelect": "true"
                 }
             ]
         }

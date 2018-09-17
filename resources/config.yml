@@ -20,3 +20,6 @@ ui:
   mail:
     # the player will be warned if someone tries to send a mail to an inactive player who haven't joined the server for ? number of days
     warn-inactive: 30
+
+# the main command name
+command: postbox

@@ -4,12 +4,15 @@ projects:
       - src: Falkirks/spoondetector/spoondetector
         version: ^0.0.1
         epitope: ".random"
+      - src: Sandertv/Marshal/Marshal
+        version: ^1.0
+        epitope: ".random"
       - src: poggit/libasynql/libasynql
         version: ^3.0
         epitope: ".random"
-      - src: SOF3/libglocal/libglocal
-        version: ^0.3
-        epitope: ".random"
+#      - src: SOF3/libglocal/libglocal
+#        version: ^0.3
+#        epitope: ".random"
       - src: SOF3/libkinetic/libkinetic
         version: ^0.0.3
         branch: "*"
