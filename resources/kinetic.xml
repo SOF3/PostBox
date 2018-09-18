@@ -6,10 +6,7 @@
 		</command>
 
 		<onStart>
-			<or onFalse="exit">
-				<permission name="postbox" not="true"/>
-				<permission name="example" not="true"/>
-			</or>
+			<permission name="postbox" onFalse="exit"/>
 		</onStart>
 
 		<list provider="InboxSenderGroupProvider" title="test" synopsis="test2" autoSelect="true"/>

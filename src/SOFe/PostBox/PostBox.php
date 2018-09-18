@@ -58,7 +58,7 @@ class PostBox extends PluginBase implements KineticAdapter, Listener{
 		SpoonDetector::printSpoon($this);
 		$this->provider = libasynql::create($this, $this->getConfig()->get("database"), [
 			"sqlite" => "sqlite.sql",
-			'mysql" => "mysql.sql",'
+			"mysql" => "mysql.sql",
 		]);
 		$this->initTranslations();
 		$this->kinetic = new KineticManager($this, $this);
@@ -126,9 +126,9 @@ EOM;
 				file_put_contents($file, <<<EOF
 <?php
 
-namespace SOFe\Libkinetic\Lang\User;
+namespace SOFe\\PostBox\\Lang\\User;
 
-class $lang extends \SOFe\Libkinetic\Lang\$lang{
+class $lang extends \\SOFe\\PostBox\\Lang\\$lang{
 $methods
 }
 
@@ -136,6 +136,8 @@ EOF
 				);
 			}
 			require_once $file;
+			$class = Lang::class . "\\User\\" . $lang;
+			$this->translations[$lang] = new $class;
 		}
 	}
 }

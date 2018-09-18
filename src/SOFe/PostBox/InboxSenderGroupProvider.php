@@ -23,15 +23,16 @@ declare(strict_types=1);
 namespace SOFe\PostBox;
 
 use Generator;
-use SOFe\Libkinetic\API\ListFactory;
-use SOFe\Libkinetic\API\ListProvider;
+use SOFe\Libkinetic\API\IconListFactory;
+use SOFe\Libkinetic\API\IconListProvider;
 use SOFe\Libkinetic\Flow\FlowContext;
+use SOFe\Libkinetic\UserString;
 
-class InboxSenderGroupProvider implements ListProvider{
-
-	public function provideList(FlowContext $context, ListFactory $factory) : Generator{
-		if(false){
-			yield;
-		}
+class InboxSenderGroupProvider implements IconListProvider{
+	public function provideIconList(FlowContext $context, IconListFactory $factory) : Generator{
+		false && yield;
+		echo "What elemetns\n";
+		$factory->addElement("foo", new UserString("test"), "foo");
+		$factory->addElement("bar", new UserString("test"), "bar");
 	}
 }

@@ -21,20 +21,9 @@
                     "<": "onStart",
                     "/": [
                         {
-                            "<": "or",
-                            "onFalse": "exit",
-                            "/": [
-                                {
-                                    "<": "permission",
-                                    "name": "postbox",
-                                    "not": "true"
-                                },
-                                {
-                                    "<": "permission",
-                                    "name": "example",
-                                    "not": "true"
-                                }
-                            ]
+                            "<": "permission",
+                            "name": "postbox",
+                            "onFalse": "exit"
                         }
                     ]
                 },
