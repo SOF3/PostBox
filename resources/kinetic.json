@@ -5,7 +5,7 @@
     "/": [
         {
             "<": "series",
-            "id": "Messages-byType",
+            "id": "messages-byType",
             "/": [
                 {
                     "<": "command",
@@ -28,11 +28,50 @@
                     ]
                 },
                 {
+                    "<": "var",
+                    "name": "totalMessages",
+                    "type": "integer"
+                },
+                {
+                    "<": "var",
+                    "name": "sender",
+                    "type": "object",
+                    "/": [
+                        {
+                            "<": "field",
+                            "name": "type",
+                            "type": "string"
+                        },
+                        {
+                            "<": "field",
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "<": "list",
-                    "provider": "InboxSenderGroupProvider",
-                    "title": "test",
-                    "synopsis": "test2",
-                    "autoSelect": "true"
+                    "provider": "InboxSenderTypeProvider",
+                    "title": "unreads_types_title",
+                    "synopsis": "unreads_types_synopsis",
+                    "autoSelect": "true",
+                    "target": "sender.type"
+                },
+                {
+                    "<": "list",
+                    "provider": "InboxSenderNameProvider",
+                    "title": "unreads_names_title",
+                    "synopsis": "unreads_names_synopsis",
+                    "target": "sender.name"
+                },
+                {
+                    "<": "onComplete",
+                    "/": [
+                        {
+                            "<": "always",
+                            "action": "execute"
+                        }
+                    ]
                 }
             ]
         }

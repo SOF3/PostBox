@@ -23,14 +23,13 @@ declare(strict_types=1);
 namespace SOFe\PostBox;
 
 use pocketmine\command\CommandSender;
-use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use ReflectionClass;
 use ReflectionMethod;
+use SOFe\Libkinetic\Flow\FlowContext;
 use SOFe\Libkinetic\KineticAdapter;
 use SOFe\Libkinetic\KineticAdapterBase;
 use SOFe\Libkinetic\KineticManager;
@@ -42,11 +41,11 @@ use function is_dir;
 use function is_file;
 use function method_exists;
 
-class PostBox extends PluginBase implements KineticAdapter, Listener{
+class PostBox extends PluginBase implements KineticAdapter{
 	use KineticAdapterBase;
 
 	/** @var DataConnector */
-	protected $provider;
+	protected $db;
 	/** @var Translation[] */
 	protected $translations = [];
 	/** @var KineticManager */
@@ -56,39 +55,43 @@ class PostBox extends PluginBase implements KineticAdapter, Listener{
 		$this->saveDefaultConfig();
 
 		SpoonDetector::printSpoon($this);
-		$this->provider = libasynql::create($this, $this->getConfig()->get("database"), [
+		$this->db = libasynql::create($this, $this->getConfig()->get("database"), [
 			"sqlite" => "sqlite.sql",
 			"mysql" => "mysql.sql",
 		]);
 		$this->initTranslations();
 		$this->kinetic = new KineticManager($this, $this);
 
-		$this->provider->executeGeneric(Queries::POSTBOX_INIT_POSTS);
-		$this->provider->executeGeneric(Queries::POSTBOX_INIT_PLAYERS);
-		$this->provider->waitAll();
+		$this->db->executeGeneric(Queries::POSTBOX_INIT_POSTS);
+		$this->db->executeGeneric(Queries::POSTBOX_INIT_PLAYERS);
+		$this->db->waitAll();
 
 		foreach($this->getServer()->getOnlinePlayers() as $player){
-			$this->initPlayer($player);
+			$this->onPlayerJoin($player);
 		}
 
-		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		$this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener($this), $this);
 	}
 
-	public function initPlayer(Player $player) : void{
-		$this->kinetic->execute(KineticIds::MESSAGES_BY_TYPE, $player);
-	}
-
-	public function e_onJoin(PlayerJoinEvent $event) : void{
-		$this->initPlayer($event->getPlayer());
+	public function onPlayerJoin(Player $player) : void{
+		$this->kinetic->execute(KineticIds::MESSAGES_BY_TYPE, $player, function() use ($player){
+			$this->db->executeChange(Queries::POSTBOX_PLAYER_TOUCH, [
+				"name" => $player->getName(),
+			]);
+		});
 	}
 
 	public function hasMessage(string $identifier) : bool{
 		return method_exists($this->translations[Translation::DEFAULT], $identifier);
 	}
 
-	public function getMessage(?CommandSender $sender, string $identifier, array $parameters) : string{
+	public function getMessage(?CommandSender $sender, string $identifier, array $parameters = []) : string{
 		$lang = $sender instanceof Player ? $sender->getLocale() : Translation::DEFAULT;
 		return ($this->translations[$lang] ?? Translation::DEFAULT)->{$identifier}($parameters);
+	}
+
+	public function getDb() : DataConnector{
+		return $this->db;
 	}
 
 	protected function initTranslations() : void{
@@ -136,7 +139,7 @@ EOF
 				);
 			}
 			require_once $file;
-			$class = Lang::class . "\\User\\" . $lang;
+			$class = __NAMESPACE__ . "\\Lang\\User\\" . $lang;
 			$this->translations[$lang] = new $class;
 		}
 	}

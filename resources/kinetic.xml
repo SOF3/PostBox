@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <kinetic namespace="SOFe\PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
-	<series id="Messages-byType">
+	<series id="messages-byType">
 		<command name="config:command">
 			<alias name="pb"/>
 		</command>
@@ -9,6 +9,18 @@
 			<permission name="postbox" onFalse="exit"/>
 		</onStart>
 
-		<list provider="InboxSenderGroupProvider" title="test" synopsis="test2" autoSelect="true"/>
+		<var name="totalMessages" type="integer"/>
+		<var name="sender" type="object">
+			<field name="type" type="string"/>
+			<field name="name" type="string"/>
+		</var>
+
+		<list provider="InboxSenderTypeProvider" title="unreads_types_title" synopsis="unreads_types_synopsis" autoSelect="true" target="sender.type"/>
+
+		<list provider="InboxSenderNameProvider" title="unreads_names_title" synopsis="unreads_names_synopsis" target="sender.name"/>
+
+		<onComplete>
+			<always action="execute"/>
+		</onComplete>
 	</series>
 </kinetic>

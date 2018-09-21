@@ -12,7 +12,7 @@ namespace SOFe\PostBox;
 
 interface KineticIds{
 	/**
-	 * &lt;series&gt; "Messages-byType" in &lt;KINETIC&gt;
+	 * &lt;series&gt; "messages-byType" in &lt;KINETIC&gt;
 	 */
-	public const MESSAGES_BY_TYPE = "Messages-byType";
+	public const MESSAGES_BY_TYPE = "messages-byType";
 }

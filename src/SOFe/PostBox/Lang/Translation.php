@@ -29,5 +29,15 @@ interface Translation{
 		"en_US",
 	];
 
-	function test() : string;
+	public function unreads_types_title(array $args) : string;
+
+	public function unreads_types_synopsis(array $args) : string;
+
+	public function unreads_types_each(array $args) : string;
+
+	public function unreads_names_title(array $args) : string;
+
+	public function unreads_names_synopsis(array $args) : string;
+
+	public function unreads_names_each(array $args) : string;
 }

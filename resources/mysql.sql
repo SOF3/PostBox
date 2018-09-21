@@ -2,109 +2,97 @@
 -- #{postbox
 -- #    {init
 -- #        {posts
-CREATE TABLE IF NOT EXISTS postbox_posts (
-	post_id     BIGINT PRIMARY KEY AUTO_INCREMENT,
-	recipient   VARCHAR(100),
-	message     VARCHAR(1000) CHARSET utf8mb4,
-	sender_type VARCHAR(250),
-	sender_name VARCHAR(250),
-	priority    TINYINT,
-	send_time   TIMESTAMP          DEFAULT CURRENT_TIMESTAMP,
-	is_unread   BOOL               DEFAULT TRUE,
-	INDEX (recipient)
-);
+CREATE TABLE IF NOT EXISTS postbox_post (
+    post_id        BIGINT PRIMARY KEY AUTO_INCREMENT,
+    sender_type    VARCHAR(100),
+    sender_name    VARCHAR(100),
+    recipient_type VARCHAR(100),
+    recipient_name VARCHAR(100),
+    priority       TINYINT,
+    send_time      TIMESTAMP          DEFAULT CURRENT_TIMESTAMP,
+    message        TEXT,
+    is_unread      BOOL,
+    INDEX (recipient_type, recipient_name, is_unread, sender_type, sender_name),
+    INDEX (sender_type, sender_name),
+    FULLTEXT (message)
+)
+    CHARSET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 -- #        }
 -- #        {players
 CREATE TABLE IF NOT EXISTS postbox_player_log (
-	player_name VARCHAR(100) PRIMARY KEY,
-	last_online TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name        VARCHAR(100) PRIMARY KEY,
+    last_online TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- #        }
 -- #    }
--- #    {unread
--- #        {dashboard
--- #            :username string
-SELECT
-	sender_type,
-	COUNT(DISTINCT sender_name) sender_count,
-	COUNT(*)                    message_count,
-	MAX(priority)               max_priority,
-	SUM(priority)               sum_priority
-FROM postbox_posts
-WHERE is_unread AND recipient = :username
-GROUP BY sender_type
-ORDER BY max_priority DESC, sum_priority DESC;
--- #        }
--- #        {by-type
--- #            {expanded
--- #                :username string
--- #                :type string
-SELECT
-	sender_name,
-	post_id,
-	message,
-	send_time
-FROM postbox_posts
-WHERE is_unread AND recipient = :username AND sender_type = :type
-ORDER BY priority DESC, send_time DESC;
--- #            }
--- #            {collapse
--- #                :username string
--- #                :type string
-SELECT
-	sender_name,
-	COUNT(*)      message_count,
-	MAX(priority) max_priority,
-	SUM(priority) sum_priority
-FROM postbox_posts
-WHERE is_unread AND recipient = :username AND sender_type = :type
-GROUP BY sender_name
-ORDER BY max_priority DESC, sum_priority DESC;
--- #            }
--- #        }
--- #        {by-type-name
--- #            :username string
--- #            :type string
--- #            :sender string
-SELECT
-	post_id,
-	message,
-	send_time
-FROM postbox_posts
-WHERE is_unread AND recipient = :username AND sender_type = :type AND sender_name = :sender
-ORDER BY priority DESC, send_time DESC;
--- #        }
--- #    }
--- #    {mark-read
--- #        :username string
--- #        :ids list:int
-UPDATE postbox_posts
-SET is_unread = 0
-WHERE recipient = :username AND post_id IN :ids;
--- #    }
--- #    {send-message
--- #        :recipient string
--- #        :senderType string
--- #        :senderName string
--- #        :priority int 0
--- #        :message string
-INSERT INTO postbox_posts (recipient, sender_type, sender_name, priority, message)
-VALUES (:recipient, :senderType, :senderName, :priority, :message);
--- #    }
 -- #    {player
--- #        {find
--- #            {by-name
--- #                :name string
-SELECT last_online
-FROM postbox_player_log
-WHERE player_name = :name;
--- #            }
--- #        }
 -- #        {touch
 -- #            :name string
-INSERT INTO postbox_player_log (player_name, last_online)
+INSERT INTO postbox_player_log(name, last_online)
 VALUES (:name, CURRENT_TIMESTAMP)
 ON DUPLICATE KEY UPDATE last_online = CURRENT_TIMESTAMP;
+-- #        }
+-- #        {group-by
+-- #            {sender-type
+-- #                :name string
+SELECT sender_type, COUNT(*) count
+FROM postbox_post
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread
+GROUP BY sender_type
+ORDER BY count DESC;
+-- #            }
+-- #            {sender-name
+-- #                :name string
+-- #                :senderType string
+SELECT sender_type, sender_name, COUNT(*) count
+FROM postbox_post
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread AND sender_type = :senderType
+GROUP BY sender_name
+ORDER BY count DESC;
+-- #            }
+-- #        }
+-- #        {list
+-- #            {sender-type-name
+-- #                :name string
+-- #                :senderType string
+-- #                :senderName string
+SELECT post_id, sender_type, sender_name, priority, send_time, message
+FROM postbox_post
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread AND sender_type = :senderType AND
+        sender_name = :senderName
+ORDER BY priority DESC, send_time DESC;
+-- #            }
+-- #            {sender-type
+-- #                :name string
+-- #                :senderType string
+SELECT post_id, sender_type, sender_name, priority, send_time, message
+FROM postbox_post
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread AND sender_type = :senderType;
+-- #            }
+-- #        }
+-- #        {search
+SELECT post_id, sender_type, sender_name,
+       recipient_type, recipient_name,
+       priority, send_time, message,
+       MATCH(message) AGAINST(:query IN NATURAL LANGUAGE MODE) similarity
+FROM postbox_post
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name
+ORDER BY similarity DESC;
+-- #        }
+-- #    }
+-- #    {mark-as
+-- #        {read
+-- #            :ids list:int
+UPDATE postbox_post
+SET is_unread = FALSE
+WHERE post_id IN :ids;
+-- #        }
+-- #        {unread
+-- #            :ids list:int
+UPDATE postbox_post
+SET is_unread = TRUE
+WHERE post_id IN :ids;
 -- #        }
 -- #    }
 -- #}

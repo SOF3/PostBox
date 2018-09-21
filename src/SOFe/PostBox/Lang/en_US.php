@@ -23,11 +23,52 @@ declare(strict_types=1);
 namespace SOFe\PostBox\Lang;
 
 class en_US implements Translation{
-	function test() : string{
-		return "Hello world";
+	public function unreads_types_title(array $args) : string{
+		return "Unread messages";
 	}
 
-	function test2(array $args) : string{
-		return "Bye world!";
+	public function unreads_types_synopsis(array $args) : string{
+		return "You have {$args["totalMessages"]} unread messages.";
+	}
+
+	public function unreads_types_each(array $args) : string{
+		return "{$args["count"]} {$this->sender_type_object($args["type"], $args["count"])}";
+	}
+
+	public function unreads_names_title(array $args) : string{
+		return "{$this->sender_type_prefix($args["sender.type"])} {$args["sender.name"]}";
+	}
+
+	public function unreads_names_synopsis(array $args) : string{
+		return "You have {$args["totalMessages"]} {$this->sender_type_prefix($args["sender.type"])}";
+	}
+
+	public function unreads_names_each(array $args) : string{
+		return "{$args["name"]} ({$args["count"]} new messages)";
+	}
+
+
+	protected function sender_type_prefix(string $type) : string{
+		switch($type){
+			case "postbox.player":
+				return "Player";
+		}
+		return $type;
+	}
+
+	protected function sender_type_object(string $type, int $quantity) : string{
+		switch($type){
+			case "postbox.player":
+				return $quantity > 1 ? "player PMs" : "player PM";
+		}
+		return "{{$type}}";
+	}
+
+	protected function sender_type_title(string $type) : string{
+		switch($type){
+			case "postbox.player":
+				return "Player PMs";
+		}
+		return "{{$type}}";
 	}
 }

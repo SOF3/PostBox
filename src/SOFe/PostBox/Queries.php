@@ -11,106 +11,88 @@ namespace SOFe\PostBox;
 
 interface Queries{
 	/**
-	 * <code>postbox.init.players</code>
-	 *
-	 * Defined in mysql.sql:22, sqlite.sql:21
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:27
 	 */
 	public const POSTBOX_INIT_PLAYERS = "postbox.init.players";
 
 	/**
-	 * <code>postbox.init.posts</code>
-	 *
-	 * Defined in mysql.sql:16, sqlite.sql:15
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:21
 	 */
 	public const POSTBOX_INIT_POSTS = "postbox.init.posts";
 
 	/**
-	 * <code>postbox.mark-read</code>
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:90
 	 *
-	 * Defined in mysql.sql:84, sqlite.sql:91
-	 *
-	 * Variables:
-	 * - <code>:username</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:ids</code> int non-empty list, required in mysql.sql, sqlite.sql
+	 * <h3>Variables</h3>
+	 * - <code>:ids</code> int non-empty list, required in mysql.sql
 	 */
-	public const POSTBOX_MARK_READ = "postbox.mark-read";
+	public const POSTBOX_MARK_AS_READ = "postbox.mark-as.read";
 
 	/**
-	 * <code>postbox.player.find.by-name</code>
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:96
 	 *
-	 * Defined in mysql.sql:101, sqlite.sql:108
-	 *
-	 * Variables:
-	 * - <code>:name</code> string, required in mysql.sql, sqlite.sql
+	 * <h3>Variables</h3>
+	 * - <code>:ids</code> int non-empty list, required in mysql.sql
 	 */
-	public const POSTBOX_PLAYER_FIND_BY_NAME = "postbox.player.find.by-name";
+	public const POSTBOX_MARK_AS_UNREAD = "postbox.mark-as.unread";
 
 	/**
-	 * <code>postbox.player.touch</code>
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:53
 	 *
-	 * Defined in mysql.sql:108, sqlite.sql:114
+	 * <h3>Variables</h3>
+	 * - <code>:senderType</code> string, required in mysql.sql
+	 * - <code>:name</code> string, required in mysql.sql
+	 */
+	public const POSTBOX_PLAYER_GROUP_BY_SENDER_NAME = "postbox.player.group-by.sender-name";
+
+	/**
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:44
 	 *
-	 * Variables:
-	 * - <code>:name</code> string, required in mysql.sql, sqlite.sql
+	 * <h3>Variables</h3>
+	 * - <code>:name</code> string, required in mysql.sql
+	 */
+	public const POSTBOX_PLAYER_GROUP_BY_SENDER_TYPE = "postbox.player.group-by.sender-type";
+
+	/**
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:72
+	 *
+	 * <h3>Variables</h3>
+	 * - <code>:senderType</code> string, required in mysql.sql
+	 * - <code>:name</code> string, required in mysql.sql
+	 */
+	public const POSTBOX_PLAYER_LIST_SENDER_TYPE = "postbox.player.list.sender-type";
+
+	/**
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:65
+	 *
+	 * <h3>Variables</h3>
+	 * - <code>:senderName</code> string, required in mysql.sql
+	 * - <code>:senderType</code> string, required in mysql.sql
+	 * - <code>:name</code> string, required in mysql.sql
+	 */
+	public const POSTBOX_PLAYER_LIST_SENDER_TYPE_NAME = "postbox.player.list.sender-type-name";
+
+	/**
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:82
+	 */
+	public const POSTBOX_PLAYER_SEARCH = "postbox.player.search";
+
+	/**
+	 * <h4>Declared in:</h4>
+	 * - resources/mysql.sql:35
+	 *
+	 * <h3>Variables</h3>
+	 * - <code>:name</code> string, required in mysql.sql
 	 */
 	public const POSTBOX_PLAYER_TOUCH = "postbox.player.touch";
-
-	/**
-	 * <code>postbox.send-message</code>
-	 *
-	 * Defined in mysql.sql:93, sqlite.sql:100
-	 *
-	 * Variables:
-	 * - <code>:senderName</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:senderType</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:recipient</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:priority</code> int, optional in mysql.sql, sqlite.sql
-	 * - <code>:message</code> string, required in mysql.sql, sqlite.sql
-	 */
-	public const POSTBOX_SEND_MESSAGE = "postbox.send-message";
-
-	/**
-	 * <code>postbox.unread.by-type-name</code>
-	 *
-	 * Defined in mysql.sql:76, sqlite.sql:83
-	 *
-	 * Variables:
-	 * - <code>:username</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:sender</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:type</code> string, required in mysql.sql, sqlite.sql
-	 */
-	public const POSTBOX_UNREAD_BY_TYPE_NAME = "postbox.unread.by-type-name";
-
-	/**
-	 * <code>postbox.unread.by-type.collapse</code>
-	 *
-	 * Defined in mysql.sql:63, sqlite.sql:68
-	 *
-	 * Variables:
-	 * - <code>:username</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:type</code> string, required in mysql.sql, sqlite.sql
-	 */
-	public const POSTBOX_UNREAD_BY_TYPE_COLLAPSE = "postbox.unread.by-type.collapse";
-
-	/**
-	 * <code>postbox.unread.by-type.expanded</code>
-	 *
-	 * Defined in mysql.sql:50, sqlite.sql:53
-	 *
-	 * Variables:
-	 * - <code>:username</code> string, required in mysql.sql, sqlite.sql
-	 * - <code>:type</code> string, required in mysql.sql, sqlite.sql
-	 */
-	public const POSTBOX_UNREAD_BY_TYPE_EXPANDED = "postbox.unread.by-type.expanded";
-
-	/**
-	 * <code>postbox.unread.dashboard</code>
-	 *
-	 * Defined in mysql.sql:37, sqlite.sql:38
-	 *
-	 * Variables:
-	 * - <code>:username</code> string, required in mysql.sql, sqlite.sql
-	 */
-	public const POSTBOX_UNREAD_DASHBOARD = "postbox.unread.dashboard";
 
 }

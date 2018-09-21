@@ -22,17 +22,18 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
-use Generator;
-use SOFe\Libkinetic\API\IconListFactory;
-use SOFe\Libkinetic\API\IconListProvider;
-use SOFe\Libkinetic\Flow\FlowContext;
-use SOFe\Libkinetic\UserString;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerJoinEvent;
 
-class InboxSenderGroupProvider implements IconListProvider{
-	public function provideIconList(FlowContext $context, IconListFactory $factory) : Generator{
-		false && yield;
-		echo "What elemetns\n";
-		$factory->addElement("foo", new UserString("test"), "foo");
-		$factory->addElement("bar", new UserString("test"), "bar");
+class PlayerJoinListener implements Listener{
+	/** @var PostBox */
+	private $plugin;
+
+	public function __construct(PostBox $plugin){
+		$this->plugin = $plugin;
+	}
+
+	public function e_playerJoin(PlayerJoinEvent $event) : void{
+		$this->plugin->onPlayerJoin($event->getPlayer());
 	}
 }

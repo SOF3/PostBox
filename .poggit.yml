@@ -1,5 +1,6 @@
 projects:
   PostBox:
+    fullGzip: true
     libs:
       - src: Falkirks/spoondetector/spoondetector
         version: ^0.0.1
@@ -10,9 +11,9 @@ projects:
       - src: poggit/libasynql/libasynql
         version: ^3.0
         epitope: ".random"
-#      - src: SOF3/libglocal/libglocal
-#        version: ^0.3
-#        epitope: ".random"
+      #      - src: SOF3/libglocal/libglocal
+      #        version: ^0.3
+      #        epitope: ".random"
       - src: SOF3/libkinetic/libkinetic
         version: ^0.0.3
         branch: "*"
