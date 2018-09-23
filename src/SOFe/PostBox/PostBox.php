@@ -96,17 +96,17 @@ class PostBox extends PluginBase implements KineticAdapter{
 	}
 
 	public function yieldSelect(string $query, array $args = []) : Generator{
-		$this->db->executeSelect($query, $args, yield, yield Await::RESOLVE);
+		$this->db->executeSelect($query, $args, yield, yield Await::REJECT);
 		return yield Await::ONCE;
 	}
 
 	public function yieldChange(string $query, array $args = []) : Generator{
-		$this->db->executeChange($query, $args, yield, yield Await::RESOLVE);
+		$this->db->executeChange($query, $args, yield, yield Await::REJECT);
 		return yield Await::ONCE;
 	}
 
 	public function yieldInsert(string $query, array $args = []) : Generator{
-		$this->db->executeInsert($query, $args, yield, yield Await::RESOLVE);
+		$this->db->executeInsert($query, $args, yield, yield Await::REJECT);
 		return yield Await::ONCE;
 	}
 
