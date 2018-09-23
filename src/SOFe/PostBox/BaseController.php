@@ -22,16 +22,11 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
-use Generator;
-use SOFe\Libkinetic\API\UiNodeStateHandler;
-use SOFe\Libkinetic\Flow\FlowContext;
+class BaseController{
+	/** @var PostBox */
+	protected $plugin;
 
-class ReplySentMessageController extends BaseController implements UiNodeStateHandler{
-	public function onStartComplete(FlowContext $context) : Generator{
-		$targetType = $context->getVariables()->getNested("sender.type");
-		$targetName = $context->getVariables()->getNested("sender.name");
-		$sourceType = "postbox.player";
-		$sourceName = $context->getUser()->getName();
-
+	public function __construct(PostBox $plugin){
+		$this->plugin = $plugin;
 	}
 }

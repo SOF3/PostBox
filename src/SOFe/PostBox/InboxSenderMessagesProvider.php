@@ -22,27 +22,30 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
+use function date;
 use Generator;
 use SOFe\Libkinetic\API\DataListProvider;
 use SOFe\Libkinetic\Flow\FlowContext;
 
-class InboxSenderMessagesProvider implements DataListProvider{
-	/** @var PostBox */
-	protected $plugin;
-
-	public function __construct(PostBox $plugin){
-		$this->plugin = $plugin;
-	}
-
-
+class InboxSenderMessagesProvider extends BaseController implements DataListProvider{
 	public function provide(FlowContext $context) : Generator{
 		$type = $context->getVariables()->getNested("sender.type");
 		$name = $context->getVariables()->getNested("sender.name");
 
-		yield $this->plugin->yieldSelect(Queries::POSTBOX_PLAYER_LIST_SENDER_TYPE_NAME, [
+		$messages = yield $this->plugin->yieldSelect(Queries::POSTBOX_PLAYER_LIST_SENDER_TYPE_NAME, [
 			"senderType" => $type,
 			"senderName" => $name,
 			"name" => $context->getUser()->getName(),
 		]);
+
+		$output = [];
+		foreach($messages as $message){
+			$output[] = [
+				"source" => $message["sender_name"],
+				"message" => $message["message"],
+				"time" => $message["send_time"],
+			];
+		}
+		return $output;
 	}
 }

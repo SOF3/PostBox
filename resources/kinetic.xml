@@ -22,13 +22,12 @@
                 <var name="reply" type="object">
                     <field name="message" type="string"/>
                 </var>
-                <recurForm provider="InboxSenderMessageProvider" title="unreads_messages_title"
-                           synopsis="unreads_messages_synopsis" timeout="1200" onCancel="skip">
+                <recurForm provider="InboxSenderMessagesProvider" title="conversation_title" timeout="1200" onCancel="skip">
                     <before var="reply">
-                        <input id="message" text="message_reply" placeholder=""/>
+                        <input id="message" text="conversation_reply" placeholder=""/>
                     </before>
                     <each>
-                        <label id="message" text="message_container_label"/>
+                        <label id="message" text="conversation_message_label"/>
                     </each>
                     <onComplete>
                         <controller class="ReplySentMessageController"/>

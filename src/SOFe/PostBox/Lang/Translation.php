@@ -40,4 +40,10 @@ interface Translation{
 	public function unreads_names_synopsis(array $args) : string;
 
 	public function unreads_names_each(array $args) : string;
+
+	public function conversation_title(array $args) : string;
+
+	public function conversation_reply(array $args) : string;
+
+	public function conversation_message_label(array $args) : string;
 }

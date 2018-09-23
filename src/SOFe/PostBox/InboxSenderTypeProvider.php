@@ -27,21 +27,12 @@ use SOFe\Libkinetic\API\IconListFactory;
 use SOFe\Libkinetic\API\IconListProvider;
 use SOFe\Libkinetic\Flow\FlowContext;
 use SOFe\Libkinetic\UserString;
-use SOFe\Libkinetic\Util\Await;
 
-class InboxSenderTypeProvider implements IconListProvider{
-	/** @var PostBox */
-	private $plugin;
-
-	public function __construct(PostBox $plugin){
-		$this->plugin = $plugin;
-	}
-
+class InboxSenderTypeProvider extends BaseController implements IconListProvider{
 	public function provideIconList(FlowContext $context, IconListFactory $factory) : Generator{
-		$this->plugin->getDb()->executeSelect(Queries::POSTBOX_PLAYER_GROUP_BY_SENDER_TYPE, [
+		$result = yield $this->plugin->yieldSelect(Queries::POSTBOX_PLAYER_GROUP_BY_SENDER_TYPE, [
 			"name" => $context->getUser()->getName(),
-		], yield, yield Await::REJECT);
-		$result = yield Await::ONCE;
+		]);
 
 		$messages = 0;
 		foreach($result as $row){

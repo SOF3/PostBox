@@ -88,9 +88,8 @@
                                 },
                                 {
                                     "<": "recurForm",
-                                    "provider": "InboxSenderMessageProvider",
-                                    "title": "unreads_messages_title",
-                                    "synopsis": "unreads_messages_synopsis",
+                                    "provider": "InboxSenderMessagesProvider",
+                                    "title": "conversation_title",
                                     "timeout": "1200",
                                     "onCancel": "skip",
                                     "/": [
@@ -101,7 +100,7 @@
                                                 {
                                                     "<": "input",
                                                     "id": "message",
-                                                    "text": "message_reply",
+                                                    "text": "conversation_reply",
                                                     "placeholder": ""
                                                 }
                                             ]
@@ -112,7 +111,7 @@
                                                 {
                                                     "<": "label",
                                                     "id": "message",
-                                                    "text": "message_container_label"
+                                                    "text": "conversation_message_label"
                                                 }
                                             ]
                                         },

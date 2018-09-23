@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox\Lang;
 
+use function date;
+
 class en_US implements Translation{
 	public function unreads_types_title(array $args) : string{
 		return "Unread messages";
@@ -70,5 +72,18 @@ class en_US implements Translation{
 				return "Player PMs";
 		}
 		return "{{$type}}";
+	}
+
+	public function conversation_title(array $args) : string{
+		return "Conversation with {$args["sender"]["name"]}";
+	}
+
+	public function conversation_reply(array $args) : string{
+		return "Reply to {$args["sender"]["name"]}";
+	}
+
+	public function conversation_message_label(array $args) : string{
+		$time = date("[H:i]", $args["time"]);
+		return "$time <{$args["source"]}> {$args["message"]}";
 	}
 }
