@@ -24,7 +24,7 @@ interface Queries{
 
 	/**
 	 * <h4>Declared in:</h4>
-	 * - resources/mysql.sql:90
+	 * - resources/mysql.sql:83
 	 *
 	 * <h3>Variables</h3>
 	 * - <code>:ids</code> int non-empty list, required in mysql.sql
@@ -33,7 +33,7 @@ interface Queries{
 
 	/**
 	 * <h4>Declared in:</h4>
-	 * - resources/mysql.sql:96
+	 * - resources/mysql.sql:89
 	 *
 	 * <h3>Variables</h3>
 	 * - <code>:ids</code> int non-empty list, required in mysql.sql
@@ -61,16 +61,6 @@ interface Queries{
 
 	/**
 	 * <h4>Declared in:</h4>
-	 * - resources/mysql.sql:72
-	 *
-	 * <h3>Variables</h3>
-	 * - <code>:senderType</code> string, required in mysql.sql
-	 * - <code>:name</code> string, required in mysql.sql
-	 */
-	public const POSTBOX_PLAYER_LIST_SENDER_TYPE = "postbox.player.list.sender-type";
-
-	/**
-	 * <h4>Declared in:</h4>
 	 * - resources/mysql.sql:65
 	 *
 	 * <h3>Variables</h3>
@@ -82,7 +72,7 @@ interface Queries{
 
 	/**
 	 * <h4>Declared in:</h4>
-	 * - resources/mysql.sql:82
+	 * - resources/mysql.sql:75
 	 */
 	public const POSTBOX_PLAYER_SEARCH = "postbox.player.search";
 

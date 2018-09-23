@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace SOFe\PostBox;
 
+use Generator;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -29,10 +30,10 @@ use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use ReflectionClass;
 use ReflectionMethod;
-use SOFe\Libkinetic\Flow\FlowContext;
 use SOFe\Libkinetic\KineticAdapter;
 use SOFe\Libkinetic\KineticAdapterBase;
 use SOFe\Libkinetic\KineticManager;
+use SOFe\Libkinetic\Util\Await;
 use SOFe\PostBox\Lang\Translation;
 use spoondetector\SpoonDetector;
 use function file_put_contents;
@@ -92,6 +93,11 @@ class PostBox extends PluginBase implements KineticAdapter{
 
 	public function getDb() : DataConnector{
 		return $this->db;
+	}
+
+	public function yieldSelect(string $query, array $args = []) : Generator{
+		$this->db->executeSelect($query, $args, yield, yield Await::RESOLVE);
+		return yield Await::ONCE;
 	}
 
 	protected function initTranslations() : void{

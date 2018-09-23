@@ -15,4 +15,14 @@ interface KineticIds{
 	 * &lt;series&gt; "messages-byType" in &lt;KINETIC&gt;
 	 */
 	public const MESSAGES_BY_TYPE = "messages-byType";
+
+	/**
+	 * &lt;series&gt; "messages-byName" in &lt;KINETIC&gt;.&lt;series&gt;
+	 */
+	public const MESSAGES_BY_NAME = "messages-byName";
+
+	/**
+	 * &lt;series&gt; "messages-conversation" in &lt;KINETIC&gt;.&lt;series&gt;.&lt;series&gt;
+	 */
+	public const MESSAGES_CONVERSATION = "messages-conversation";
 }

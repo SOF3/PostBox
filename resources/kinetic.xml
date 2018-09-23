@@ -1,26 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <kinetic namespace="SOFe\PostBox" xmlns="https://rawgit.com/SOF3/libkinetic/master/libkinetic.xsd">
-	<series id="messages-byType">
-		<command name="config:command">
-			<alias name="pb"/>
-		</command>
+    <series id="messages-byType">
+        <command name="config:command">
+            <alias name="pb"/>
+        </command>
 
-		<onStart>
-			<permission name="postbox" onFalse="exit"/>
-		</onStart>
-
-		<var name="totalMessages" type="integer"/>
-		<var name="sender" type="object">
-			<field name="type" type="string"/>
-			<field name="name" type="string"/>
-		</var>
-
-		<list provider="InboxSenderTypeProvider" title="unreads_types_title" synopsis="unreads_types_synopsis" autoSelect="true" target="sender.type"/>
-
-		<list provider="InboxSenderNameProvider" title="unreads_names_title" synopsis="unreads_names_synopsis" target="sender.name"/>
-
-		<onComplete>
-			<always action="execute"/>
-		</onComplete>
-	</series>
+        <var name="totalMessages" type="integer"/>
+        <var name="sender" type="object">
+            <field name="type" type="string"/>
+            <field name="name" type="string"/>
+        </var>
+        <onStart>
+            <permission name="postbox" onFalse="exit"/>
+        </onStart>
+        <list provider="InboxSenderTypeProvider" title="unreads_types_title" synopsis="unreads_types_synopsis"
+              autoSelect="true" target="sender.type"/>
+        <series id="messages-byName" onCancel="skip">
+            <list provider="InboxSenderNameProvider" title="unreads_names_title" synopsis="unreads_names_synopsis"
+                  target="sender.name"/>
+            <series id="messages-conversation" onCancel="skip">
+                <var name="reply" type="object">
+                    <field name="message" type="string"/>
+                </var>
+                <recurForm provider="InboxSenderMessageProvider" title="unreads_messages_title"
+                           synopsis="unreads_messages_synopsis" timeout="1200" onCancel="skip">
+                    <before var="reply">
+                        <input id="message" text="message_reply" placeholder=""/>
+                    </before>
+                    <each>
+                        <label id="message" text="message_container_label"/>
+                    </each>
+                    <onComplete>
+                        <controller class="ReplySentMessageController"/>
+                    </onComplete>
+                </recurForm>
+                <onComplete>
+                    <always action="execute"/>
+                </onComplete>
+            </series>
+            <onComplete>
+                <always action="execute"/>
+            </onComplete>
+        </series>
+        <onComplete>
+            <always action="execute"/>
+        </onComplete>
+    </series>
 </kinetic>

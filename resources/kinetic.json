@@ -18,16 +18,6 @@
                     ]
                 },
                 {
-                    "<": "onStart",
-                    "/": [
-                        {
-                            "<": "permission",
-                            "name": "postbox",
-                            "onFalse": "exit"
-                        }
-                    ]
-                },
-                {
                     "<": "var",
                     "name": "totalMessages",
                     "type": "integer"
@@ -50,6 +40,16 @@
                     ]
                 },
                 {
+                    "<": "onStart",
+                    "/": [
+                        {
+                            "<": "permission",
+                            "name": "postbox",
+                            "onFalse": "exit"
+                        }
+                    ]
+                },
+                {
                     "<": "list",
                     "provider": "InboxSenderTypeProvider",
                     "title": "unreads_types_title",
@@ -58,11 +58,96 @@
                     "target": "sender.type"
                 },
                 {
-                    "<": "list",
-                    "provider": "InboxSenderNameProvider",
-                    "title": "unreads_names_title",
-                    "synopsis": "unreads_names_synopsis",
-                    "target": "sender.name"
+                    "<": "series",
+                    "id": "messages-byName",
+                    "onCancel": "skip",
+                    "/": [
+                        {
+                            "<": "list",
+                            "provider": "InboxSenderNameProvider",
+                            "title": "unreads_names_title",
+                            "synopsis": "unreads_names_synopsis",
+                            "target": "sender.name"
+                        },
+                        {
+                            "<": "series",
+                            "id": "messages-conversation",
+                            "onCancel": "skip",
+                            "/": [
+                                {
+                                    "<": "var",
+                                    "name": "reply",
+                                    "type": "object",
+                                    "/": [
+                                        {
+                                            "<": "field",
+                                            "name": "message",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "<": "recurForm",
+                                    "provider": "InboxSenderMessageProvider",
+                                    "title": "unreads_messages_title",
+                                    "synopsis": "unreads_messages_synopsis",
+                                    "timeout": "1200",
+                                    "onCancel": "skip",
+                                    "/": [
+                                        {
+                                            "<": "before",
+                                            "var": "reply",
+                                            "/": [
+                                                {
+                                                    "<": "input",
+                                                    "id": "message",
+                                                    "text": "message_reply",
+                                                    "placeholder": ""
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "<": "each",
+                                            "/": [
+                                                {
+                                                    "<": "label",
+                                                    "id": "message",
+                                                    "text": "message_container_label"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "<": "onComplete",
+                                            "/": [
+                                                {
+                                                    "<": "controller",
+                                                    "class": "ReplySentMessageController"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "<": "onComplete",
+                                    "/": [
+                                        {
+                                            "<": "always",
+                                            "action": "execute"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "<": "onComplete",
+                            "/": [
+                                {
+                                    "<": "always",
+                                    "action": "execute"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     "<": "onComplete",

@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS postbox_post (
     sender_name    VARCHAR(100),
     recipient_type VARCHAR(100),
     recipient_name VARCHAR(100),
-    priority       TINYINT,
     send_time      TIMESTAMP          DEFAULT CURRENT_TIMESTAMP,
     message        TEXT,
     is_unread      BOOL,
     INDEX (recipient_type, recipient_name, is_unread, sender_type, sender_name),
+    INDEX (recipient_type, recipient_name, sender_type, sender_name, send_time),
     INDEX (sender_type, sender_name),
     FULLTEXT (message)
 )
@@ -57,24 +57,17 @@ ORDER BY count DESC;
 -- #                :name string
 -- #                :senderType string
 -- #                :senderName string
-SELECT post_id, sender_type, sender_name, priority, send_time, message
+SELECT post_id, sender_type, sender_name, send_time, message
 FROM postbox_post
-WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread AND sender_type = :senderType AND
+WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND sender_type = :senderType AND
         sender_name = :senderName
-ORDER BY priority DESC, send_time DESC;
--- #            }
--- #            {sender-type
--- #                :name string
--- #                :senderType string
-SELECT post_id, sender_type, sender_name, priority, send_time, message
-FROM postbox_post
-WHERE recipient_type = 'postbox.player' AND recipient_name = :name AND is_unread AND sender_type = :senderType;
+ORDER BY send_time DESC;
 -- #            }
 -- #        }
 -- #        {search
 SELECT post_id, sender_type, sender_name,
        recipient_type, recipient_name,
-       priority, send_time, message,
+       send_time, message,
        MATCH(message) AGAINST(:query IN NATURAL LANGUAGE MODE) similarity
 FROM postbox_post
 WHERE recipient_type = 'postbox.player' AND recipient_name = :name

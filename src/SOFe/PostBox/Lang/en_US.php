@@ -36,11 +36,11 @@ class en_US implements Translation{
 	}
 
 	public function unreads_names_title(array $args) : string{
-		return "{$this->sender_type_prefix($args["sender.type"])} {$args["sender.name"]}";
+		return "{$this->sender_type_prefix($args["sender"]["type"])} {$args["sender"]["name"]}";
 	}
 
 	public function unreads_names_synopsis(array $args) : string{
-		return "You have {$args["totalMessages"]} {$this->sender_type_prefix($args["sender.type"])}";
+		return "You have {$args["totalMessages"]} {$this->sender_type_prefix($args["sender"]["type"])}";
 	}
 
 	public function unreads_names_each(array $args) : string{
